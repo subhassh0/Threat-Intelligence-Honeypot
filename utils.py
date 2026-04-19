@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # Yahan apna Discord Webhook URL paste karein
-DISCORD_WEBHOOK = "YOUR_WEBHOOK_URL_HERE"
+DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1495401074897715391/0zjJL2FsHPgXmmHbVTWjCGhMYPd7T8GpGaaPOWlgX5g1KXut10gWwAS7XwZfvQDzttKJ"
 
 # --- MITRE ATT&CK MAPPING ---
 MITRE_TAGS = {
