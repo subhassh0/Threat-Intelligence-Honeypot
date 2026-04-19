@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Secure Access | CyGuard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        .split-layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .left-side {
+            background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
+            color: white;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .right-side {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+        }
+
+        .brand-logo i {
+            color: #64ffda;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            height: 55px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding-left: 20px;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(10, 25, 47, 0.1);
+            border-color: #0a192f;
+        }
+
+        .btn-primary {
+            background-color: #0a192f;
+            border: none;
+            height: 55px;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #112240;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(10, 25, 47, 0.3);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            z-index: 10;
+        }
+
+        .security-badges {
+            margin-top: 40px;
+            text-align: center;
+            color: #8892b0;
+            font-size: 0.85rem;
+        }
+
+        .security-badges i {
+            margin: 0 10px;
+            font-size: 1.2rem;
+            color: #a8b2d1;
+        }
+
+        @media (max-width: 768px) {
+            .split-layout {
+                flex-direction: column;
+            }
+
+            .left-side {
+                flex: none;
+                height: 30vh;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .left-side p {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="split-layout">
+        <div class="left-side">
+            <div class="brand-logo" style="position: relative; z-index: 2;">
+                <i class="fas fa-network-wired"></i>
+                <h1 class="fw-bold mb-3">Enterprise Global Intranet</h1>
+                <p style="color: #8892b0; font-size: 1.1rem; max-width: 400px;">Secure Employee & Administrator Access
+                    Portal. All activities are monitored and logged per corporate policy.</p>
+            </div>
+        </div>
+
+        <div class="right-side">
+            <div class="login-container">
+                <h3 class="fw-bold mb-1" style="color: #0a192f;">SIGN IN</h3>
+                <p class="text-muted mb-4">Please Enter Your Corporate Credentials</p>
+
+                {% if error %}
+                <div class="alert alert-danger d-flex align-items-center p-3 mb-4" role="alert"
+                    style="border-radius: 8px; font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <div>{{ error }}</div>
+                </div>
+                {% endif %}
+
+                <form action="/login" method="POST" id="loginForm">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Employee ID"
+                            required autocomplete="off">
+                        <label for="username"><i class="far fa-user me-2 text-muted"></i>Employee ID</label>
+                    </div>
+                    <div class="form-floating mb-4 position-relative">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password"
+                            required>
+                        <label for="password"><i class="fas fa-lock me-2 text-muted"></i>Password</label>
+                        <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="loginBtn">
+                        <span id="btnText">Secure Login</span><i class="fas fa-arrow-right ms-2" id="btnIcon"></i>
+                        <span class="spinner-border spinner-border-sm d-none ms-2" id="btnSpinner" role="status"
+                            aria-hidden="true"></span>
+                    </button>
+                </form>
+
+                <div class="security-badges">
+                    <p class="mb-2"><i class="fas fa-shield-alt"></i> Protected by AES-256 Encryption</p>
+                    <div><i class="fab fa-aws"></i><i class="fab fa-expeditedssl"></i><i class="fas fa-fingerprint"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('#togglePassword').addEventListener('click', function (e) {
+            const password = document.querySelector('#password');
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function () {
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true; btn.style.backgroundColor = "#8892b0";
+            document.getElementById('btnText').innerText = "Authenticating...";
+            document.getElementById('btnIcon').classList.add('d-none');
+            document.getElementById('btnSpinner').classList.remove('d-none');
+        });
+    </script>
+</body>
+
+</html>

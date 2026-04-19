@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CyGuard SOC Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        body {
+            background-color: #0d1117;
+            font-family: 'Segoe UI', sans-serif;
+            color: #c9d1d9;
+        }
+
+        .navbar {
+            background-color: #161b22 !important;
+            border-bottom: 2px solid #58a6ff;
+        }
+
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+        }
+
+        .badge-mitre {
+            background-color: #58a6ff;
+            color: black;
+            font-weight: bold;
+        }
+
+        .blink-dot {
+            height: 10px;
+            width: 10px;
+            background-color: #238636;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(35, 134, 54, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(35, 134, 54, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(35, 134, 54, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark px-4 py-3">
+        <div class="container-fluid">
+            <a class="navbar-brand text-primary fw-bold" href="#"><i class="fas fa-shield-alt me-2"></i>CyGuard SOC
+                Center</a>
+            <div class="d-flex align-items-center">
+                <div class="me-4 text-success fw-bold"><span class="blink-dot me-2"></span>Monitoring Active</div>
+                <button class="btn btn-outline-primary btn-sm" onclick="exportPDF()"><i
+                        class="fas fa-download me-2"></i>Forensic Report</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4 px-4">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card p-3 h-100">
+                    <h6 class="text-secondary">Total Security Events</h6>
+                    <h2 class="fw-bold">{{ attacks|length }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3 h-100 border-danger border-start border-4">
+                    <h6 class="text-secondary">IPs Automatically Blocked</h6>
+                    <h2 class="fw-bold text-danger">{{ blocked_count }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3 h-100 border-success border-start border-4">
+                    <h6 class="text-secondary">Active Defense Status</h6>
+                    <h5 class="text-success mt-1">SIEM & PCAP Active</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header py-3"><i class="fas fa-list-ul me-2"></i>Live SIEM Event Logs</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0" id="logsTable">
+                        <thead>
+                            <tr>
+                                <th>Time (UTC)</th>
+                                <th>Source IP</th>
+                                <th>Location Trace</th>
+                                <th>MITRE ID</th>
+                                <th>Payload</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attack in attacks %}
+                            <tr>
+                                <td class="text-secondary">{{ attack.timestamp }}</td>
+                                <td><code class="text-info">{{ attack.src_ip }}</code></td>
+                                <td>
+                                    <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                    {{ attack.geo.city if attack.geo else 'Unknown' }},
+                                    {{ attack.geo.country if attack.geo else 'Unknown' }}
+                                </td>
+                                <td><span class="badge badge-mitre">{{ attack.mitre_technique_id if
+                                        attack.mitre_technique_id else 'N/A' }}</span></td>
+                                <td>
+                                    U: {{ attack.payload.username_attempted if attack.payload else '---' }} |
+                                    P: {{ attack.payload.password_attempted if attack.payload else '---' }}
+                                </td>
+                                <td>
+                                    {% if attack.action == "blocked" %}
+                                    <span class="text-danger fw-bold"><i class="fas fa-ban me-1"></i>BLOCKED</span>
+                                    {% else %}
+                                    <span class="text-muted">Logged</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">No security events logged yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l');
+            doc.text("CYGUARD INCIDENT REPORT", 14, 20);
+            doc.autoTable({ html: '#logsTable', startY: 30, theme: 'grid' });
+            doc.save('CyGuard_Forensic_Report.pdf');
+        }
+    </script>
+</body>
+
+</html>

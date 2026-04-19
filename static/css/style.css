@@ -1,0 +1,34 @@
+/* Cyberpunk / NSA Theme */
+body {
+    background-color: #0f0f0f !important;
+}
+
+.card {
+    border: 1px solid #333;
+}
+
+.text-success {
+    color: #00ff00 !important;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+.blink {
+    animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Map Popup Styling */
+.leaflet-popup-content-wrapper {
+    background: #000;
+    color: #0f0;
+    border: 1px solid #0f0;
+}
+
+.leaflet-popup-tip {
+    background: #0f0;
+}
